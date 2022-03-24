@@ -3,5 +3,4 @@ imageio==2.9.0
 numpy==1.19.1
 opencv_python==4.4.0.40
 scikit_image==0.17.2
-skimage==0.0
 streamlit==1.7.0
