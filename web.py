@@ -97,7 +97,6 @@ criterion_threshold_slider = st.sidebar.slider(
 
 image_location = st.empty()
 
-@st.cache
 def show_image(uploaded_file):
     image_location.image(uploaded_file, caption='Image', use_column_width=True)
 
@@ -148,7 +147,7 @@ if uploaded_file is not None:
 
     image_modified, num_components = filterByCriterion("compac", criterion_threshold_slider)
 
-    st.sidebar.write("Number of resulting components:", num_components)
+#    st.sidebar.write("Number of resulting components:", num_components)
 
     image_location.image(image_modified, caption='Image', use_column_width=True)
     #st.write(os.listdir())
