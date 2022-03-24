@@ -4,7 +4,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-import cv2.cv as cv
+import cv2 as cv
 
 import imageio
 from skimage import data
