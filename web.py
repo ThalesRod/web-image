@@ -101,18 +101,12 @@ st.sidebar.button('Say hello')
 
 if uploaded_file is not None:
   st.sidebar.write("Uploaded file:", uploaded_file)
-
-if size is not None:
-  st.sidebar.write("Size:", size)
-else:
-  st.sidebar.write("Size: None")
   
 def show_image(uploaded_file):
     image_location.image(uploaded_file, caption='Image', use_column_width=True)
 
 if uploaded_file is not None:
 
-    show_image(uploaded_file)
 
     image = imageio.imread(uploaded_file)
     image = image.astype(np.float32) / 255
@@ -158,6 +152,8 @@ if uploaded_file is not None:
     image_modified, num_components = filterByCriterion("compac", 0.55)
 
 #    st.sidebar.write("Number of resulting components:", num_components)
+
+    show_image(uploaded_file)
 
     image_location.image(image_modified, caption='Image', use_column_width=True)
     #st.write(os.listdir())
