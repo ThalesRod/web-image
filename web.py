@@ -114,21 +114,12 @@ def load_image_gradient(uploaded_file):
     graph = hg.get_4_adjacency_graph(size)
     edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
 
-    tree, altitudes = hg.watershed_hierarchy_by_dynamics(graph, edge_weights)
-    altitudes /= altitudes.max()
+    return graph, edge_weights, image, size
 
-    explorer = hg.HorizontalCutExplorer(tree, altitudes)
-
-    mean_color =  hg.attribute_mean_vertex_weights(tree, image)
-
-    num_regions = 50
-
-    cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
-    cut_nodes_nodes = cut_nodes.nodes()
-    
+@st.experimental_memo
+def reconstruct_cut_image(cut_nodes, tree, mean_color)
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
-    
-    return cut_image, image, size, mean_color, cut_nodes_nodes, tree
+    return cut_image
     
 def filter_by_color(mean_color, cut_nodes_nodes, tree, thresh: int = 50) -> np.ndarray:
   # Filtering by mean color
@@ -169,8 +160,17 @@ if uploaded_file is not None:
 
     show_image(uploaded_file)
 
-    cut_image, image, size, mean_color, cut_nodes, tree = load_image_gradient(uploaded_file)
+    graph, edge_weights, image, size = load_image_gradient(uploaded_file)
 
+    tree, altitudes = hg.watershed_hierarchy_by_dynamics(graph, edge_weights)
+    altitudes /= altitudes.max()
+    explorer = hg.HorizontalCutExplorer(tree, altitudes)
+    mean_color =  hg.attribute_mean_vertex_weights(tree, image)
+    num_regions = 50
+    cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
+
+    cut_image = reconstruct_cut_image(cut_nodes, tree, mean_color)
+ 
     # filtering by color and shape
     cut_image = filter_by_color(mean_color, cut_nodes, tree, 40)
 
