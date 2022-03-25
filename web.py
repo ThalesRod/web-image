@@ -127,13 +127,13 @@ def load_image_gradient(uploaded_file):
 
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     
-    return cut_image, size
+    return cut_image, image, size
     
 if uploaded_file is not None:
 
     show_image(uploaded_file)
 
-    cut_image, size = load_image_gradient(uploaded_file)
+    cut_image, image, size = load_image_gradient(uploaded_file)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
