@@ -100,7 +100,7 @@ image_location = st.empty()
 def show_image(uploaded_file):
     image_location.image(uploaded_file, caption='Image', use_column_width=True)
 
-@st.cache
+@st.cache(hash_funcs={"MyUnhashableClass": lambda _: None})
 def load_image_gradient(uploaded_file):
     image = imageio.imread(uploaded_file)
     image = image.astype(np.float32) / 255
