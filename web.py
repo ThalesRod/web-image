@@ -95,7 +95,7 @@ criterion_threshold_slider = st.sidebar.slider(
 #with col1:
 #    image_location = st.empty()
 
-image_location = st.empty()
+# image_location = st.empty()
 
 st.sidebar.button('Say hello')
 
@@ -103,7 +103,7 @@ if uploaded_file is not None:
   st.sidebar.write("Uploaded file:", uploaded_file)
   
 def show_image(uploaded_file):
-    image_location.image(uploaded_file, caption='Image', use_column_width=True)
+    st.image(uploaded_file, caption='Image', use_column_width=True)
 
 if uploaded_file is not None:
 
@@ -154,7 +154,7 @@ if uploaded_file is not None:
 
 #    st.sidebar.write("Number of resulting components:", num_components)
 
-    image_location.image(image_modified, caption='Image', use_column_width=True)
+    st.image(image_modified, caption='Image', use_column_width=True)
     #st.write(os.listdir())
     # im = imgGen2(uploaded_file)	
     # st.image(im, caption='ASCII art', use_column_width=True) 
