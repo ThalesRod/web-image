@@ -97,7 +97,7 @@ criterion_threshold_slider = st.sidebar.slider(
 
 image_location = st.empty()
 
-print(uploaded_file)
+st.sidebar.write("Uploaded file:", uploaded_file)
 
 def show_image(uploaded_file):
     image_location.image(uploaded_file, caption='Image', use_column_width=True)
