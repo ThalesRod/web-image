@@ -97,6 +97,8 @@ criterion_threshold_slider = st.sidebar.slider(
 
 image_location = st.empty()
 
+st.siderbar.button('Say hello')
+
 if uploaded_file is not None:
   st.sidebar.write("Uploaded file:", uploaded_file)
 
