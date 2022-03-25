@@ -111,68 +111,29 @@ def load_image_gradient(uploaded_file):
     detector = cv.ximgproc.createStructuredEdgeDetection(get_sed_model_file())
     gradient_image = detector.detectEdges(image)
 
-    return gradient_image, image, size
+    graph = hg.get_4_adjacency_graph(size)
+    edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
 
-#@st.experimental_memo
-#def reconstruct_cut_image(_cut_nodes, _tree, mean_color):
-#    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
-#    return cut_image
+    tree, altitudes = hg.watershed_hierarchy_by_dynamics(graph, edge_weights)
+    altitudes /= altitudes.max()
+
+    explorer = hg.HorizontalCutExplorer(tree, altitudes)
+
+    mean_color =  hg.attribute_mean_vertex_weights(tree, image)
+
+    num_regions = 50
+
+    cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
+
+    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     
-def filter_by_color(mean_color, cut_nodes, tree, thresh: int = 50) -> np.ndarray:
-  # Filtering by mean color
-  cells_mean_colors = (mean_color[cut_nodes.nodes()]*255).astype(np.uint8)
-  ind = np.lexsort((cells_mean_colors[:, 2], cells_mean_colors[:, 1], cells_mean_colors[:, 0]))
-
-  # reference_color = (58, 19, 9)
-  reference_color = (18, 4, 2)
-
-  cells_mean_colors_distances = np.array([np.linalg.norm(reference_color - index) for index in cells_mean_colors])
-
-  deleted = np.ones(tree.num_vertices(), dtype=np.bool)
-  deleted[cut_nodes.nodes().max()] = False
-
-  color_threshold = thresh
-
-  deleted[ cut_nodes.nodes()[ np.where(cells_mean_colors_distances < color_threshold) ] ] = False
-
-  deletedNodes = cut_nodes.nodes()[ np.where(cells_mean_colors_distances >= color_threshold) ]
-  deletedNodes = np.delete(deletedNodes, np.where(deletedNodes == cut_nodes.nodes().max()))
-
-  im1 = hg.reconstruct_leaf_data(tree, mean_color, deleted)
-
-  im_coordinates = hg.attribute_vertex_coordinates(tree.leaf_graph)
-  im_coordinates = np.reshape(im_coordinates, (-1, im_coordinates.shape[-1]))
-
-  bg_mean_color = im1.max(axis=1).max(axis=0) # background mean color
-
-  for deletedNode in deletedNodes:
-    st, nm = tree.sub_tree(deletedNode)
-    leaves = [leave for leave in st.leaves()]
-    pixel_coordinates = im_coordinates[nm[leaves]] # pixel coordinates of the deleted objects
-    im1[pixel_coordinates[:, 0], pixel_coordinates[:, 1]] = bg_mean_color
-  
-  return im1
+    return cut_image, image, size
     
 if uploaded_file is not None:
 
     show_image(uploaded_file)
 
-    gradient_image, image, size = load_image_gradient(uploaded_file)
-
-    graph = hg.get_4_adjacency_graph(size)
-    edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
-    tree, altitudes = hg.watershed_hierarchy_by_dynamics(graph, edge_weights)
-    altitudes /= altitudes.max()
-    explorer = hg.HorizontalCutExplorer(tree, altitudes)
-    mean_color =  hg.attribute_mean_vertex_weights(tree, image)
-    num_regions = 50
-    cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
-
-#    cut_image = reconstruct_cut_image(cut_nodes, tree, mean_color)
-    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
-    
-    # filtering by color and shape
-#     cut_image = filter_by_color(mean_color, cut_nodes, tree, 40)
+    cut_image, image, size = load_image_gradient(uploaded_file)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
