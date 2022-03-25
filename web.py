@@ -110,14 +110,14 @@ def load_image_gradient(uploaded_file):
     detector = cv.ximgproc.createStructuredEdgeDetection(get_sed_model_file())
     gradient_image = detector.detectEdges(image)
 
-    return gradient_image, size
+    return gradient_image, size, image
     
     
 if uploaded_file is not None:
 
     show_image(uploaded_file)
 
-    gradient_image, size = load_image_gradient(uploaded_file)
+    gradient_image, size, image = load_image_gradient(uploaded_file)
     
     graph = hg.get_4_adjacency_graph(size)
     edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
