@@ -127,13 +127,51 @@ def load_image_gradient(uploaded_file):
 
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     
-    return cut_image, image, size
+    return cut_image, image, size, mean_color, cut_nodes, tree
+    
+def filter_by_color(mean_color, cut_nodes, tree, thresh: int = 50) -> np.ndarray:
+  # Filtering by mean color
+  cells_mean_colors = (mean_color[cut_nodes.nodes()]*255).astype(np.uint8)
+  ind = np.lexsort((cells_mean_colors[:, 2], cells_mean_colors[:, 1], cells_mean_colors[:, 0]))
+
+  # reference_color = (58, 19, 9)
+  reference_color = (18, 4, 2)
+
+  cells_mean_colors_distances = np.array([np.linalg.norm(reference_color - index) for index in cells_mean_colors])
+
+  deleted = np.ones(tree.num_vertices(), dtype=np.bool)
+  deleted[cut_nodes.nodes().max()] = False
+
+  color_threshold = thresh
+
+  deleted[ cut_nodes.nodes()[ np.where(cells_mean_colors_distances < color_threshold) ] ] = False
+
+  deletedNodes = cut_nodes.nodes()[ np.where(cells_mean_colors_distances >= color_threshold) ]
+  deletedNodes = np.delete(deletedNodes, np.where(deletedNodes == cut_nodes.nodes().max()))
+
+  im1 = hg.reconstruct_leaf_data(tree, mean_color, deleted)
+
+  im_coordinates = hg.attribute_vertex_coordinates(tree.leaf_graph)
+  im_coordinates = np.reshape(im_coordinates, (-1, im_coordinates.shape[-1]))
+
+  bg_mean_color = im1.max(axis=1).max(axis=0) # background mean color
+
+  for deletedNode in deletedNodes:
+    st, nm = tree.sub_tree(deletedNode)
+    leaves = [leave for leave in st.leaves()]
+    pixel_coordinates = im_coordinates[nm[leaves]] # pixel coordinates of the deleted objects
+    im1[pixel_coordinates[:, 0], pixel_coordinates[:, 1]] = bg_mean_color
+  
+  return im1
     
 if uploaded_file is not None:
 
     show_image(uploaded_file)
 
-    cut_image, image, size = load_image_gradient(uploaded_file)
+    cut_image, image, size, mean_color, cut_nodes, tree = load_image_gradient(uploaded_file)
+
+    # filtering by color and shape
+    cut_image = filter_by_color(mean_color, cut_nodes, tree, 40)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
