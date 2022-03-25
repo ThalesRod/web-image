@@ -113,7 +113,7 @@ def load_image_gradient(uploaded_file):
 
     return gradient_image, image, size
 
-@st.experimental_memo
+@st.experimental_memo(hash_funcs={"MyUnhashableClass": lambda _: None})
 def reconstruct_cut_image(cut_nodes, tree, mean_color):
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     return cut_image
