@@ -172,7 +172,7 @@ if uploaded_file is not None:
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     
     # filtering by color and shape
-    cut_image = filter_by_color(mean_color, cut_nodes, tree, 40)
+#     cut_image = filter_by_color(mean_color, cut_nodes, tree, 40)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
