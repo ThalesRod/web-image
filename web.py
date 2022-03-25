@@ -124,14 +124,15 @@ def load_image_gradient(uploaded_file):
     num_regions = 50
 
     cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
-
+    cut_nodes_nodes = cut_nodes.nodes()
+    
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     
-    return cut_image, image, size, mean_color, cut_nodes, tree
+    return cut_image, image, size, mean_color, cut_nodes_nodes, tree
     
-def filter_by_color(mean_color, cut_nodes, tree, thresh: int = 50) -> np.ndarray:
+def filter_by_color(mean_color, cut_nodes_nodes, tree, thresh: int = 50) -> np.ndarray:
   # Filtering by mean color
-  cells_mean_colors = (mean_color[cut_nodes.nodes()]*255).astype(np.uint8)
+  cells_mean_colors = (mean_color[cut_nodes_nodes]*255).astype(np.uint8)
   ind = np.lexsort((cells_mean_colors[:, 2], cells_mean_colors[:, 1], cells_mean_colors[:, 0]))
 
   # reference_color = (58, 19, 9)
@@ -140,14 +141,14 @@ def filter_by_color(mean_color, cut_nodes, tree, thresh: int = 50) -> np.ndarray
   cells_mean_colors_distances = np.array([np.linalg.norm(reference_color - index) for index in cells_mean_colors])
 
   deleted = np.ones(tree.num_vertices(), dtype=np.bool)
-  deleted[cut_nodes.nodes().max()] = False
+  deleted[cut_nodes_nodes.max()] = False
 
   color_threshold = thresh
 
-  deleted[ cut_nodes.nodes()[ np.where(cells_mean_colors_distances < color_threshold) ] ] = False
+  deleted[ cut_nodes_nodes[ np.where(cells_mean_colors_distances < color_threshold) ] ] = False
 
-  deletedNodes = cut_nodes.nodes()[ np.where(cells_mean_colors_distances >= color_threshold) ]
-  deletedNodes = np.delete(deletedNodes, np.where(deletedNodes == cut_nodes.nodes().max()))
+  deletedNodes = cut_nodes_nodes[ np.where(cells_mean_colors_distances >= color_threshold) ]
+  deletedNodes = np.delete(deletedNodes, np.where(deletedNodes == cut_nodes_nodes.max()))
 
   im1 = hg.reconstruct_leaf_data(tree, mean_color, deleted)
 
