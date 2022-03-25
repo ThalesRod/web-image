@@ -95,18 +95,14 @@ criterion_threshold_slider = st.sidebar.slider(
 #with col1:
 #    image_location = st.empty()
 
-# image_location = st.empty()
+image_location = st.empty()
 
-st.sidebar.button('Say hello')
-
-if uploaded_file is not None:
-  st.sidebar.write("Uploaded file:", uploaded_file)
-  
 def show_image(uploaded_file):
-    st.image(uploaded_file, caption='Image', use_column_width=True)
+    image_location.image(uploaded_file, caption='Image', use_column_width=True)
 
 if uploaded_file is not None:
 
+    show_image(uploaded_file)
 
     image = imageio.imread(uploaded_file)
     image = image.astype(np.float32) / 255
@@ -132,7 +128,6 @@ if uploaded_file is not None:
     cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
 
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)
-    show_image(uploaded_file)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
@@ -150,11 +145,11 @@ if uploaded_file is not None:
 
     compac = hg.attribute_compactness(t1, normalize=True)[t1.num_leaves():]
 
-    image_modified, num_components = filterByCriterion("compac", 0.55)
+    image_modified, num_components = filterByCriterion("compac", criterion_threshold_slider)
 
-#    st.sidebar.write("Number of resulting components:", num_components)
+    st.sidebar.write("Number of resulting components:", num_components)
 
-    st.image(image_modified, caption='Image', use_column_width=True)
+    image_location.image(image_modified, caption='Image', use_column_width=True)
     #st.write(os.listdir())
     # im = imgGen2(uploaded_file)	
     # st.image(im, caption='ASCII art', use_column_width=True) 
