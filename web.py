@@ -113,10 +113,10 @@ def load_image_gradient(uploaded_file):
 
     return gradient_image, image, size
 
-@st.experimental_memo
-def reconstruct_cut_image(_cut_nodes, _tree, mean_color):
-    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
-    return cut_image
+#@st.experimental_memo
+#def reconstruct_cut_image(_cut_nodes, _tree, mean_color):
+#    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
+#    return cut_image
     
 def filter_by_color(mean_color, cut_nodes, tree, thresh: int = 50) -> np.ndarray:
   # Filtering by mean color
@@ -168,8 +168,9 @@ if uploaded_file is not None:
     num_regions = 50
     cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
 
-    cut_image = reconstruct_cut_image(cut_nodes, tree, mean_color)
- 
+#    cut_image = reconstruct_cut_image(cut_nodes, tree, mean_color)
+    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
+    
     # filtering by color and shape
     cut_image = filter_by_color(mean_color, cut_nodes, tree, 40)
 
