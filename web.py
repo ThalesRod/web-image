@@ -100,7 +100,7 @@ image_location = st.empty()
 def show_image(uploaded_file):
     image_location.image(uploaded_file, caption='Image', use_column_width=True)
 
-@st.experimental_memo
+@st.experimental_memo(max_entries=3)
 def load_image_gradient(uploaded_file):
     image = imageio.imread(uploaded_file)
     image = image.astype(np.float32) / 255
