@@ -111,10 +111,7 @@ def load_image_gradient(uploaded_file):
     detector = cv.ximgproc.createStructuredEdgeDetection(get_sed_model_file())
     gradient_image = detector.detectEdges(image)
 
-    graph = hg.get_4_adjacency_graph(size)
-    edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
-
-    return graph, edge_weights, image, size
+    return gradient_image, image, size
 
 @st.experimental_memo
 def reconstruct_cut_image(cut_nodes, tree, mean_color):
@@ -160,8 +157,10 @@ if uploaded_file is not None:
 
     show_image(uploaded_file)
 
-    graph, edge_weights, image, size = load_image_gradient(uploaded_file)
+    gradient_image, image, size = load_image_gradient(uploaded_file)
 
+    graph = hg.get_4_adjacency_graph(size)
+    edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
     tree, altitudes = hg.watershed_hierarchy_by_dynamics(graph, edge_weights)
     altitudes /= altitudes.max()
     explorer = hg.HorizontalCutExplorer(tree, altitudes)
