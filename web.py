@@ -117,7 +117,7 @@ def load_image_gradient(uploaded_file):
     return graph, edge_weights, image, size
 
 @st.experimental_memo
-def reconstruct_cut_image(cut_nodes, tree, mean_color)
+def reconstruct_cut_image(cut_nodes, tree, mean_color):
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
     return cut_image
     
