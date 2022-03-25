@@ -24,7 +24,7 @@ def draw_contours(img, contours_to_draw):
 
   return image_modified
 
-@st.cache
+@st.experimental_memo
 def filterByCriterion(criterion = "compac", thresh = 0.55, normalize=False):
 
   # transform max-tree (t1) into a graph
