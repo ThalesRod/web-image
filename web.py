@@ -145,7 +145,7 @@ if uploaded_file is not None:
 
     compac = hg.attribute_compactness(t1, normalize=True)[t1.num_leaves():]
 
-    image_modified, num_components = filterByCriterion("compac", criterion_threshold_slider)
+    image_modified, num_components = filterByCriterion("compac", 0.55)
 
 #    st.sidebar.write("Number of resulting components:", num_components)
 
