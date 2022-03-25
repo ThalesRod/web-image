@@ -111,15 +111,6 @@ def load_image_gradient(uploaded_file):
     detector = cv.ximgproc.createStructuredEdgeDetection(get_sed_model_file())
     gradient_image = detector.detectEdges(image)
 
-    return gradient_image, size, image
-    
-    
-if uploaded_file is not None:
-
-    show_image(uploaded_file)
-
-    gradient_image, size, image = load_image_gradient(uploaded_file)
-    
     graph = hg.get_4_adjacency_graph(size)
     edge_weights = hg.weight_graph(graph, gradient_image, hg.WeightFunction.mean)
 
@@ -134,7 +125,15 @@ if uploaded_file is not None:
 
     cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
 
-    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)
+    cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)    
+    
+    return cut_image, size
+    
+if uploaded_file is not None:
+
+    show_image(uploaded_file)
+
+    cut_image, size = load_image_gradient(uploaded_file)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
