@@ -115,7 +115,6 @@ if uploaded_file is not None:
     size = image.shape[:2]
 
     detector = cv.ximgproc.createStructuredEdgeDetection(get_sed_model_file())
-    show_image(uploaded_file)
     gradient_image = detector.detectEdges(image)
 
     graph = hg.get_4_adjacency_graph(size)
@@ -133,6 +132,7 @@ if uploaded_file is not None:
     cut_nodes = explorer.horizontal_cut_from_num_regions(num_regions, at_least=True)
 
     cut_image = cut_nodes.reconstruct_leaf_data(tree, mean_color)
+    show_image(uploaded_file)
 
     # creating binary image from cut image
     img_components = label((rgb2gray(cut_image)*255).astype(np.uint8))
