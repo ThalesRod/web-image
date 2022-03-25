@@ -115,6 +115,7 @@ if uploaded_file is not None:
     size = image.shape[:2]
 
     detector = cv.ximgproc.createStructuredEdgeDetection(get_sed_model_file())
+    show_image(uploaded_file)
     gradient_image = detector.detectEdges(image)
 
     graph = hg.get_4_adjacency_graph(size)
@@ -152,8 +153,6 @@ if uploaded_file is not None:
     image_modified, num_components = filterByCriterion("compac", 0.55)
 
 #    st.sidebar.write("Number of resulting components:", num_components)
-
-    show_image(uploaded_file)
 
     image_location.image(image_modified, caption='Image', use_column_width=True)
     #st.write(os.listdir())
